@@ -18,17 +18,19 @@ public class SignInManager : MonoBehaviour
         client = new(connectionString);
     }
 
-    public void AttemptSignIn(string text)
+    public void AttemptSignIn(string studentID)
     {
         onStartSignIn?.Invoke();
 
         try
         {
             var collection = client.GetDatabase("time-clock-database").GetCollection<BsonDocument>("users");
-            var filter = Builders<BsonDocument>.Filter.Eq("studentID", int.Parse(text));
+            var filter = Builders<BsonDocument>.Filter.Eq("studentID", int.Parse(studentID));
 
             string document = collection.Find(filter).First().AsString;
             UserData userData = JsonUtility.FromJson<UserData>(document);
+
+            FindFirstObjectByType<OptionsManager>().studentID = studentID;
 
             onSuccess?.Invoke(userData);
         }
